@@ -21,7 +21,7 @@ app.get('/test',function(request,response){
     var bucket = "ncase-px";
 
     // Random filename. If there's a collision, well crap.
-    var filename = "ncase.txt";
+    var filename = "dot.png";
     
     // Request storage container
     var req = sunny.connection.getContainer(bucket);
@@ -32,8 +32,8 @@ app.get('/test',function(request,response){
         console.log("GET container: %s", container.name);
        
         // Write blob
-        var stream = container.putBlob(filename,{ encoding: "utf8" });
-        stream.write("AW YISS");
+        var stream = container.putBlob(filename,{ encoding:"base64" });
+        stream.write("iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==","base64");
 
         stream.on('end', function (results, meta) {
             

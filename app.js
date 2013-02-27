@@ -16,6 +16,7 @@ var mongoURI = process.env.MONGOLAB_URI || process.env.MONGO_URI;
 var sunny = require("sunny").Configuration.fromEnv();
 
 
+
 ////////////////////////////////////////////////
 // REST API
 ////////////////////////////////////////////////
@@ -23,6 +24,14 @@ var sunny = require("sunny").Configuration.fromEnv();
 // Return all art metadata
 app.get('/art', function(request, response){
     
+    mongo.connect(mongoURI, function(err, db) {
+        db.collection('art').find().toArray(function(err,items){
+            var json = JSON.stringify(items);
+            response.end(json);
+            db.close();
+        });
+    });
+
 });
 
 // Upload a piece of art & metadata
@@ -31,13 +40,13 @@ app.post('/art', function(request, response){
     // METAINFO
     var author = request.body.author || "";
     var dataURL = request.body.dataURL;
-    if(!dataURL) throw new Error("You need a png dataURL");
 
     // Change this bucket name to whatever yours is
     var bucket = "ncase-px";
 
-    // Random filename. If there's a collision, well crap.
-    var filename = "dot.png";
+    // Random filename. If there's a collision, well, crap.
+    var filename = (Math.random().toString(36).substr(2)) + (Math.random().toString(36).substr(2));
+    filename += ".png";
     
     // Request storage container
     var req = sunny.connection.getContainer(bucket);
@@ -45,17 +54,18 @@ app.post('/art', function(request, response){
 
         // Container info
         var container = results.container;
-        console.log("GET container: %s", container.name);
+        console.log("GET container: "+container.name);
        
-        // Write blob
+        // Write image blob
         var stream = container.putBlob(filename,{ encoding:"base64" });
-        stream.write("iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==","base64");
+        stream.write(dataURL,"base64");
 
         stream.on('end', function (results, meta) {
             
             // Blob info
-            console.log("PUT blob: %s", results.blob.name);
+            console.log("PUT blob: "+results.blob.name);
             var data = {
+                author: author,
                 url: "http://"+process.env.SUNNY_AUTH_URL+"/"+bucket+"/"+filename
             };
 
@@ -64,8 +74,10 @@ app.post('/art', function(request, response){
                 db.collection('art').insert( data, function(err,inserted){
 
                     // Finally Respond
-                    console.log("Inserted art metadata");
-                    response.end( JSON.stringify(inserted[0]) );
+                    var json = JSON.stringify(inserted[0]);
+                    console.log("Inserted art metadata: "+json);
+                    response.end(json);
+                    db.close();
 
                 });
             });

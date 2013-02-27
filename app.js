@@ -15,7 +15,23 @@ var mongoURI = process.env.MONGOLAB_URI || process.env.MONGO_URI;
 // Sunny
 var sunny = require("sunny").Configuration.fromEnv();
 
-app.get('/test',function(request,response){
+
+////////////////////////////////////////////////
+// REST API
+////////////////////////////////////////////////
+
+// Return all art metadata
+app.get('/art', function(request, response){
+    
+});
+
+// Upload a piece of art & metadata
+app.post('/art', function(request, response){
+
+    // METAINFO
+    var author = request.body.author || "";
+    var dataURL = request.body.dataURL;
+    if(!dataURL) throw new Error("You need a png dataURL");
 
     // Change this bucket name to whatever yours is
     var bucket = "ncase-px";
@@ -60,21 +76,6 @@ app.get('/test',function(request,response){
     });
     req.end();
 
-
-});
-
-
-////////////////////////////////////////////////
-// REST API
-////////////////////////////////////////////////
-
-// Return all art metadata
-app.get('/art', function(request, response){
-    
-});
-
-// Upload a piece of art & metadata
-app.post('/art', function(request, response){
 });
 
 

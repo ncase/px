@@ -1,0 +1,18 @@
+{
+
+	"name": "ncase-uncommon",
+	"version": "0.0.1",
+
+	"dependencies": {
+		"mongodb": "latest",
+    	"sendgrid": "0.2.5",
+		"express": "latest",
+    	"ejs": "~0.7.1"
+	},
+
+	"engines": {
+		"node": "0.8.x",
+		"npm": "1.1.x"
+	}
+
+}

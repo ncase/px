@@ -15,26 +15,51 @@ var mongoURI = process.env.MONGOLAB_URI || process.env.MONGO_URI;
 // Sunny
 var sunny = require("sunny").Configuration.fromEnv();
 
-
 app.get('/test',function(request,response){
-    
-    // Upload art
-    request = sunny.connection.getContainer("ncase-px");
-    request.on('end', function (results, meta) {
 
-        var containerObj = results.container;
-        console.log("GET container: %s", containerObj.name);
+    // Change this bucket name to whatever yours is
+    var bucket = "ncase-px";
+
+    // Random filename. If there's a collision, well crap.
+    var filename = "ncase.txt";
+    
+    // Request storage container
+    var req = sunny.connection.getContainer(bucket);
+    req.on('end', function (results, meta) {
+
+        // Container info
+        var container = results.container;
+        console.log("GET container: %s", container.name);
        
-        var request = containerObj.putBlob("foobar.txt",{ encoding: "utf8" });
-        request.on('end', function (results, meta) {
-            var blobObj = results.blob;
-            console.log("PUT blob: %s", blobObj.name);
-            response.end();
+        // Write blob
+        var stream = container.putBlob(filename,{ encoding: "utf8" });
+        stream.write("AW YISS");
+
+        stream.on('end', function (results, meta) {
+            
+            // Blob info
+            console.log("PUT blob: %s", results.blob.name);
+            var data = {
+                url: "http://"+process.env.SUNNY_AUTH_URL+"/"+bucket+"/"+filename
+            };
+
+            // Record in database
+            mongo.connect(mongoURI, function(err, db) {
+                db.collection('art').insert( data, function(err,inserted){
+
+                    // Finally Respond
+                    console.log("Inserted art metadata");
+                    response.end( JSON.stringify(inserted[0]) );
+
+                });
+            });
+
         });
-        request.end();
+        stream.end();
 
     });
-    request.end();
+    req.end();
+
 
 });
 
@@ -50,25 +75,6 @@ app.get('/art', function(request, response){
 
 // Upload a piece of art & metadata
 app.post('/art', function(request, response){
-    
-    // Upload art
-    request = sunny.connection.getContainer("ncase-px");
-    request.on('end', function (results, meta) {
-
-        console.log("GET container: %s", containerObj.name);
-        var containerObj = results.container;
-       
-        var request = containerObj.putBlob("foobar.txt",{ encoding: "utf8" });
-        request.on('end', function (results, meta) {
-            var blobObj = results.blob;
-            console.log("PUT blob: %s", blobObj.name);
-            response.end();
-        });
-        request.end();
-
-    });
-    request.end();
-
 });
 
 

@@ -1,13 +1,11 @@
-px
+px = pixel art by players, for players.
 ===
-
-Pixel art by players, for players.
 
 Check out the [live demo](http://px.craftyy.com)!
 
 ---
 
-### What does this do?
+### Why would I use px?
 
 By embedding px in your game, your players can customize & create their own art, characters, and hats.
 
@@ -17,7 +15,7 @@ And finally, all art made is auto-registered with [Creative Commons](http://crea
 
 ---
 
-### How do I use this?
+### How do I use px?
 
 You don't need to download this repo to use px!
 
@@ -27,7 +25,7 @@ Embedding px into an HTML game is just a script tag away:
 
 Prompt your player to create or customize an image:
 
-	px.edit(image,function(newImage){
+	px.edit(image, function(newImage){
 		// callback
 	});    
 
@@ -53,4 +51,6 @@ A silly weekend project by [N. Case](http://ncase.me)
 Node.JS libraries used: Express, Sunny, Mongo
 
 Special thanks to [Creative Commons](http://creativecommons.org/) and [Dan Mills](http://creativecommons.org/staff#danmills)
+
+And of course, all MIT licensed.
 

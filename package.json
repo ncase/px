@@ -1,13 +1,12 @@
 {
 
-	"name": "ncase-uncommon",
+	"name": "ncase-px",
 	"version": "0.0.1",
 
 	"dependencies": {
 		"mongodb": "latest",
-    	"sendgrid": "0.2.5",
 		"express": "latest",
-    	"ejs": "~0.7.1"
+    	"sunny": "latest"
 	},
 
 	"engines": {

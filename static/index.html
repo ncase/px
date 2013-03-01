@@ -1,0 +1,58 @@
+<body>
+	<img id="avatar" crossOrigin="Anonymous" src="http://commondatastorage.googleapis.com/ncase-px/player.png"/>
+	<button onclick="edit()">edit</button>
+	<br>
+	<br>
+	<input id="author" placeholder="[anonymous]">
+	<button onclick="save()">save to cc</button>
+	<br>
+	<br>
+	<button onclick="browse()">browse cc</button>
+</body>
+
+<script src="Toolbox.js"></script>
+<script>
+
+var img = document.getElementById("avatar");
+
+var appDraw = Toolbox.open("pixeldraw.html");
+var edit = function(){
+    appDraw.open(img.src,function(response){
+    	img.removeAttribute("crossOrigin");
+        img.src = response;
+    });
+};
+
+var appCommons = Toolbox.open("commons.html");
+var browse = function(){
+	appCommons.open(null,function(){});
+}
+
+var save = function(){
+
+	// AUTHOR
+	var author = document.getElementById("author").value;
+
+	// DATA URL
+    var canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    var ctx = canvas.getContext('2d');
+    ctx.drawImage(img,0,0);
+    var image = canvas.toDataURL();
+
+    // POST
+	var xhr = new XMLHttpRequest();
+    xhr.open("POST","/art");
+    xhr.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+    xhr.onreadystatechange = function() {
+        if(xhr.readyState===4 && xhr.status===200){
+        	var response = xhr.responseText;
+        	console.log(response);
+        	browse();
+        }
+    };
+    xhr.send("author="+encodeURIComponent(author)+"&image="+encodeURIComponent(image));
+}
+
+</script>

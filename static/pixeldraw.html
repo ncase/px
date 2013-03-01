@@ -1,0 +1,134 @@
+<body style="background:#BADA55">
+    <canvas id="canvas" width="400" height="400" style="width:400px;height:400px;border:solid 2px black"></canvas>
+    <br>
+    <button onclick="output()">output</button>
+    <br>
+</body>
+
+
+<script src="Toolbox.js"></script>
+<script>
+
+Toolbox.on("input",function(src){
+
+    var img = new Image();
+    if(src.indexOf('data')!=0) img.crossOrigin="Anonymous";
+    img.onload = function(){
+
+        // GET IMAGE DATA
+        imageCanvas.width = img.width;
+        imageCanvas.height = img.height;
+        imageContext.drawImage(img,0,0);
+
+        // DRAW BIGASS PIXELS
+        blowUp();
+
+        // SHRINK CANVAS
+        imageContext.drawImage(canvas,0,0,img.width,img.height);
+
+    };
+
+    img.src = src;
+
+});
+
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+
+var canvas = document.getElementById("canvas");
+var ctx = canvas.getContext('2d');
+
+var imageCanvas = document.createElement("canvas");
+var imageContext = imageCanvas.getContext('2d');
+document.body.appendChild(imageCanvas);
+
+function output(){
+    var data = imageCanvas.toDataURL();
+    Toolbox.tellParent("output",data);
+    return data;
+}
+
+function blowUp(){
+    
+    canvas.width = canvas.width;
+
+    var img = imageCanvas;
+    var imageData = imageContext.getImageData(0,0,img.width,img.height);
+    var data=imageData.data, w=img.width, h=img.height;
+    var scaleX=canvas.width/w, scaleY=canvas.height/h;
+    for(var x=0; x<w; x++) {
+        for(var y=0; y<h; y++) {
+            var index = ((w*y)+x)*4;
+            var r=data[index], g=data[index+1], b=data[index+2], a=data[index+3]/255;
+            ctx.fillStyle = "rgba("+r+","+g+","+b+","+a+")";
+            ctx.fillRect( x*scaleX, y*scaleY, scaleX, scaleY );
+        }
+    }
+
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+var _mousePressed = false;
+function draw(event){
+
+    if(!_mousePressed) return;
+    var relativePos = _getRelativeMouse(canvas,event);
+
+    var img = imageCanvas;
+    var w=img.width, h=img.height;
+    var scaleX=canvas.width/w, scaleY=canvas.height/h;
+    relativePos.x = Math.floor(relativePos.x/scaleX);
+    relativePos.y = Math.floor(relativePos.y/scaleY);
+
+    if(relativePos.x<0||relativePos.x>=img.width||relativePos.y<0||relativePos.y>=img.height) return;
+    
+    // Put in pixel
+    var imageData = imageContext.getImageData(0,0,img.width,img.height);
+    var data=imageData.data, x=relativePos.x, y=relativePos.y;
+    var index = ((w*y)+x)*4;
+    data[index] = 50;
+    data[index+1] = 100;
+    data[index+2] = 150;
+    data[index+3] = 255;
+    imageContext.putImageData(imageData,0,0);
+
+    // Blow Up
+    blowUp();
+
+};
+function _getRelativeMouse(el,event) {       
+    var _x = 0;
+    var _y = 0;
+    while( el && !isNaN( el.offsetLeft ) && !isNaN( el.offsetTop ) ) {
+        _x += el.offsetLeft - el.scrollLeft;
+        _y += el.offsetTop - el.scrollTop;
+        el = el.offsetParent;
+    }
+    return {
+        x: event.pageX-_x,
+        y: event.pageY-_y
+    };    
+}
+
+canvas.addEventListener("mousemove",draw,false);
+
+canvas.addEventListener("mousedown",function(event){
+    _mousePressed=true;
+    draw(event);
+},false);
+
+window.addEventListener("mouseup",function(){
+    _mousePressed=false;
+},false);
+
+
+
+
+</script>

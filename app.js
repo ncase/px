@@ -16,7 +16,6 @@ var mongoURI = process.env.MONGOLAB_URI || process.env.MONGO_URI;
 var sunny = require("sunny").Configuration.fromEnv();
 
 
-
 ////////////////////////////////////////////////
 // REST API
 ////////////////////////////////////////////////
@@ -39,7 +38,8 @@ app.post('/art', function(request, response){
 
     // METAINFO
     var author = request.body.author || "";
-    var dataURL = request.body.dataURL;
+    var image = request.body.image || "";
+    image = image.replace(/^data:image\/\w+;base64,/,"");
 
     // Change this bucket name to whatever yours is
     var bucket = "ncase-px";
@@ -58,7 +58,7 @@ app.post('/art', function(request, response){
        
         // Write image blob
         var stream = container.putBlob(filename,{ encoding:"base64" });
-        stream.write(dataURL,"base64");
+        stream.write(image,"base64");
 
         stream.on('end', function (results, meta) {
             

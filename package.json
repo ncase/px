@@ -4,9 +4,9 @@
 	"version": "0.0.1",
 
 	"dependencies": {
-		"mongodb": "latest",
-		"express": "latest",
-    	"sunny": "latest"
+		"mongodb": "1.2.13",
+		"express": "3.1.0",
+    	"sunny": "0.0.6"
 	},
 
 	"engines": {
